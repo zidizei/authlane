@@ -2,7 +2,6 @@ require 'authlane/version'
 
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
-require 'yard'
 
 namespace :doc do
   desc 'Generate YARD documentation database'
@@ -21,5 +20,7 @@ namespace :doc do
     system 'open doc/index.html'
   end
 end
+
+RSpec::Core::RakeTask.new(:spec)
 
 Dir['tasks/*.rake'].sort.each { |ext| load ext }
