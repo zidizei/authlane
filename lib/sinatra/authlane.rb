@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'sinatra/cookies'
 
 require 'authlane/version'
 require 'authlane/serializeduser'
@@ -85,8 +86,8 @@ module Sinatra
         :session_key       => :authlane,              # name of the Session key to store the login data
         :remember_cookie   => :authlane_token,        # Cookie name to store 'Remember Me' token
         :auth_strategy     => Proc.new { false },     # strategy to be executed to log in users
-        :role_strategy     => Proc.new { true },     # strategy to be executed to check permissions and roles
-        :remember_strategy => Proc.new { nil },       # strategy to be executed to log in users via 'Remember Me' token
+        :role_strategy     => Proc.new { true },      # strategy to be executed to check permissions and roles
+        :remember_strategy => Proc.new { false },     # strategy to be executed to log in users via 'Remember Me' token
         :forget_strategy   => Proc.new { false },     # strategy to be executed when logging out and 'forgetting' the user
         :serialize_user    => [:id]                   # specify User model fields to be serialized into the login session
     end
@@ -223,5 +224,6 @@ module Sinatra
     end
   end
 
-  register AuthLane
+  helpers Sinatra::Cookies
+  register Sinatra::AuthLane
 end
