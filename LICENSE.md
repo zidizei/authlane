@@ -1,4 +1,4 @@
-Copyright (c) 2014 Patrick Lam
+Copyright (c) 2014-2015 Patrick Lam
 
 MIT License
 
