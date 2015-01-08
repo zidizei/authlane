@@ -42,7 +42,7 @@ module Sinatra
   # to display the login form, but can be set to anything that is needed, as long the it is
   # not protected by authorisation as well.
   #
-  # ## `:seession_key`
+  # ## `:session_key`
   #
   # The `:session_key` sets the name (as a Symbol) of the Session variable where User credentials of a logged in
   # User are stored. The stored User data are wrapped inside a {Sinatra::AuthLane::SerializedUser SerializedUser}

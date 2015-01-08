@@ -25,7 +25,7 @@ set :authlane, :failed_route    => '/user/unauthorized',
 
 The `:failed_route` sets the route String, where AuthLane should redirect to in case a route requires authorisation and the User ist not logged in. It typically is the route to display the login form, but can be set to anything that is needed, as long the it is not protected by authorisation as well.
 
-### `:seession_key`
+### `:session_key`
 
 The `:session_key` sets the name (as a Symbol) of the Session variable where User credentials of a logged in User are stored. The stored User data are wrapped inside a `SerializedUser` object and can be retrieved by using Sinatra's `session` helper and giving it the key that is defined here `session[:authlane]`. Alternatively, the AuthLane Helper exposes the method `current_user` to provide easy access to User data.
 
