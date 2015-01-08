@@ -8,7 +8,7 @@ module Sinatra
     #
     module Helpers
       ##
-      # @note This method uses {#uthorized?} to decide, whether to redirect users to `failed_route`.
+      # @note This method uses {#authorized?} to decide, whether to redirect users to `failed_route`.
       # Check if a user is authorized to view a route.
       #
       # It utilizes the *Role* and *Remember Strategy* to see if a user can access the route this
