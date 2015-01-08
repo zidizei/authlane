@@ -1,0 +1,1 @@
+--no-private --main=README.md --markup=markdown --plugin yard-sinatra lib/**/*.rb
