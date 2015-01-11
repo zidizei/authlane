@@ -166,12 +166,11 @@ module Sinatra
       # required by the implemented strategy to follow these to be usable by AuthLane.
       #
       # @note The **Remember** Strategy is only responsible for automatically logging in a user.
-      #   The necessary Cookie token (or whatever technique) is usually set in the **Auth** Strategy.
+      #   The necessary Cookie token (plus any additional logic) is usually set in the **Auth** Strategy.
       #
       # @example
-      #   Sinatra::AuthLane.create_remember_strategy do
-      #     remember_token  = cookies[:authlane_token]
-      #     remembered_user = User.find_by_token(remember_token)
+      #   Sinatra::AuthLane.create_remember_strategy do |token|
+      #     remembered_user = User.find_by_token(token)
       #
       #     (remembered_user.nil?) ? false : remembered_user
       #   end
