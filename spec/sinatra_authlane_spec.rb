@@ -1,4 +1,4 @@
-require File.expand_path '../helper.rb', __FILE__
+require File.expand_path '../spec_helper.rb', __FILE__
 
 describe Sinatra::AuthLane do
   def strategy(type, &block)
