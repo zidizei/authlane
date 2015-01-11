@@ -76,7 +76,7 @@ module Sinatra
         # can come up with some User credentials.
         if session[settings.authlane[:session_key]].nil?
           remember_token = cookies[settings.authlane[:remember_cookie]]
-          remember_strat = self.instance_eval(remember_token, &settings.authlane[:remember_strategy])
+          remember_strat = self.instance_exec(remember_token, &settings.authlane[:remember_strategy])
 
           if remember_strat
             user = Sinatra::AuthLane::SerializedUser.new(remember_strat, settings.authlane[:serialize_user])
