@@ -84,7 +84,7 @@ module Sinatra
       app.set :authlane,
         :failed_route      => '/user/unauthorized',   # route to redirect to if the user is required to login
         :session_key       => :authlane,              # name of the Session key to store the login data
-        :remember_cookie   => :authlane_token,        # Cookie name to store 'Remember Me' token
+        :remember_cookie   => :'authlane.token',      # Cookie name to store 'Remember Me' token
         :auth_strategy     => Proc.new { false },     # strategy to be executed to log in users
         :role_strategy     => Proc.new { true },      # strategy to be executed to check permissions and roles
         :remember_strategy => Proc.new { false },     # strategy to be executed to log in users via 'Remember Me' token
