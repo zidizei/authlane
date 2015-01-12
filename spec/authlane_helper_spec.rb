@@ -2,13 +2,18 @@ require File.expand_path '../spec_helper.rb', __FILE__
 
 describe Sinatra::AuthLane::Helpers do
   before :all do
+    build_rack_test_session 'rspec'
+
     mock_app do
       helpers Sinatra::Cookies
       register Sinatra::AuthLane
 
       use Rack::Session::Cookie, :secret => 'rspec'
 
-      Sinatra::AuthLane.create_auth_strategy { { id: 1 } }
+      Sinatra::AuthLane.create_auth_strategy do
+        cookies[:'authlane.token'] = 'rspec'
+        { id: '1' }
+      end
 
       get '/protected' do
         protect!
@@ -35,13 +40,30 @@ describe Sinatra::AuthLane::Helpers do
       get '/user' do
         protect!
         user = current_user
-        user
+        user[:id]
       end
     end
   end
 
+  before :each do
+    clear_cookies
+  end
+
+
+  it "should authorize a User" do
+    get '/authorize'
+    last_response.should be_ok
+  end
+
+  it "should remember a User by setting the token cookie" do
+    expect(rack_mock_session.cookie_jar['authlane.token']).to be(nil)
+    get '/authorize'
+    expect(rack_mock_session.cookie_jar['authlane.token']).to eq('rspec')
+  end
+
   it "should be able to recognize authorized states" do
-    get '/authorized', {}, { 'rack.session' => { authlane: { id: 1 } } }
+    get '/authorize'
+    get '/authorized'
     expect(last_response.body).to eq('authorized')
   end
 
@@ -55,23 +77,33 @@ describe Sinatra::AuthLane::Helpers do
     expect(last_response.headers['location']).to eq('http://example.org/user/unauthorized')
   end
 
-  it "should display protected route when logged in" do
-    get '/protected', {}, { 'rack.session' => { authlane: '1' } }
-    last_response.should be_ok
-  end
-
-  it "should authorize a User" do
+  it "should show protected route when logged in" do
     get '/authorize'
+    get '/protected'
     last_response.should be_ok
   end
 
   it "should unauthorize a User" do
-    get '/unauthorize', {}, { 'rack.session' => { authlane: '1' } }
+    get '/authorize'
+    get '/authorized'
+    expect(last_response.body).to eq('authorized')
+    get '/unauthorize'
     expect(last_response.headers['location']).to eq('http://example.org/user/unauthorized')
+    get '/authorized'
+    expect(last_response.body).to eq('unauthorized')
+  end
+
+  it "should forget a User's remember token" do
+    get '/authorize'
+    expect(rack_mock_session.cookie_jar['authlane.token']).to eq('rspec')
+
+    get '/unauthorize'
+    expect(rack_mock_session.cookie_jar['authlane.token']).to eq('')
   end
 
   it "should be able to get the current User's serialized credentials" do
-    get '/user', {}, { 'rack.session' => { authlane: '1' } }
+    get '/authorize'
+    get '/user'#, {}, { 'rack.session' => { authlane: '1' } }
     expect(last_response.body).to eq('1')
   end
 end
