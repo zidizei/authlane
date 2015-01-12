@@ -8,9 +8,11 @@ Gem::Specification.new do |spec|
   spec.version       = Authlane::VERSION
   spec.authors       = ['Patrick Lam']
   spec.email         = ['zidizei@gmail.com']
-  spec.summary       = 'Easy User authentication and roles for Sinatra.'
-  spec.description   = 'The AuthLane Sinatra Extension allows easy User authentication with support for different User roles.'
-  spec.homepage      = ''
+  spec.summary       = 'Simple User authentication and roles for Sinatra.'
+  spec.description   = <<-EOF
+    The AuthLane Sinatra Extension allows simple User authentication with support
+    for different User roles. It comes with Sinatra helpers for easy integration into routes.
+  EOF
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
