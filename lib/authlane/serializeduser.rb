@@ -24,7 +24,11 @@ module Sinatra
           @user = Hash.new
 
           attributes.each do |attrs|
-            @user[attrs] = user.__send__(attrs.to_sym) if user.respond_to? attrs
+            if user.respond_to? attrs
+              @user[attrs] = user.__send__(attrs.to_sym)
+            elsif user.is_a?(Hash) and user.key? attrs
+              @user[attrs] = user[attrs]
+            end
           end
         end
       end
@@ -63,7 +67,11 @@ module Sinatra
       ##
       # Return a Hash representing the serialized object's attributes and values.
       #
-      # If the whole Object was stored its `to_h` will be called.
+      # If the whole Object that was stored is a Hash itself, its `to_h` will be called.
+      # Otherwise, the Object's instance methods are called and mapped to a Hash. This is
+      # only the case when the passed user object is not a Hash and no specific **attributes**
+      # for storage are set (see {#initialize})
+      #
       # In either case, attribute names can be accessed by Symbol or String
       # key alike.
       #
@@ -71,7 +79,16 @@ module Sinatra
       #
       def to_h
         universal_hash = Hash.new
-        hash = @user.to_h
+
+        if @user.is_a? Hash
+          hash = @user.to_h
+        else
+          hash = {}
+          @user.class.instance_methods(false).each do |key|
+            hash[key] = @user.__send__ key
+          end
+        end
+
         hash.each_pair do |key, value|
           universal_hash[key.to_s] = value if key.is_a? Symbol
 
