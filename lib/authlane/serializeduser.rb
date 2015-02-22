@@ -46,6 +46,13 @@ module Sinatra
       end
 
       ##
+      #
+      #
+      def []=(key, value)
+        (@user.is_a? Hash) ? @user[key] = value : @user.__send__(key.to_sym, value)
+      end
+
+      ##
       # Enables Object-like access to the
       # stored attributes.
       #
@@ -58,9 +65,9 @@ module Sinatra
       #
       def method_missing(m, *args, &block)
         if @user.is_a? Hash
-          @user[m]
+          (m.to_s.index('=').nil?) ? @user[m] : @user[m] = args[1]
         else
-          @user.__send__(m.to_sym, args)
+          @user.__send__(m, args)
         end
       end
 
