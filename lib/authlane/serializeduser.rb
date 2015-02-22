@@ -49,6 +49,7 @@ module Sinatra
       #
       #
       def []=(key, value)
+        return if key.to_s == 'id'
         (@user.is_a? Hash) ? @user[key] = value : @user.__send__(key.to_sym, value)
       end
 
@@ -65,7 +66,11 @@ module Sinatra
       #
       def method_missing(m, *args, &block)
         if @user.is_a? Hash
-          (m.to_s.index('=').nil?) ? @user[m] : @user[m] = args[1]
+          if m.to_s.index('=').nil?
+            @user[m]
+          elsif m.to_s.index('id').nil?
+            @user[m] = args[1]
+          end
         else
           @user.__send__(m, args)
         end

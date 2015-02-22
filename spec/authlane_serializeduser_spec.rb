@@ -61,4 +61,11 @@ describe Sinatra::AuthLane::SerializedUser do
     user[:name] = 'Rspec'
     user[:name].should eql('Rspec')
   end
+
+  it 'can not change id attribute after initialization' do
+    user = Sinatra::AuthLane::SerializedUser.new(MockUser.new, [:id])
+    user[:id].should eql(1)
+    user[:id] = 2
+    user[:id].should eql(1)
+  end
 end
