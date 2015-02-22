@@ -79,7 +79,7 @@ module Sinatra
           remember_strat = (remember_token.nil?) ? false : self.instance_exec(remember_token, &settings.authlane[:remember_strategy])
 
           if remember_strat
-            user = Sinatra::AuthLane::SerializedUser.new(remember_strat, settings.authlane[:serialize_user])
+            user = serialize_user(remember_strat)
 
             # The strategy doesn't log in a User,
             # it just comes up with the credentials to do that.
@@ -139,7 +139,7 @@ module Sinatra
           redirect settings.authlane[:failed_route], 303
         end
 
-        session[settings.authlane[:session_key]] = Sinatra::AuthLane::SerializedUser.new(strat, settings.authlane[:serialize_user])
+        session[settings.authlane[:session_key]] = serialize_user(strat)
       end
 
       ##
@@ -186,6 +186,18 @@ module Sinatra
       #
       def current_user
         session[settings.authlane[:session_key]]
+      end
+
+      private
+
+      ##
+      #
+      def serialize_user(obj)
+        if settings.authlane[:serialize_user].is_a? Array
+          Sinatra::AuthLane::SerializedUser.new(obj, settings.authlane[:serialize_user])
+        elsif settings.authlane[:serialize_user].is_a? Class
+          settings.authlane[:serialize_user].new(obj)
+        end
       end
     end
   end

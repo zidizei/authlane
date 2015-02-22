@@ -90,6 +90,7 @@ module Sinatra
         :remember_strategy => Proc.new { false },     # strategy to be executed to log in users via 'Remember Me' token
         :forget_strategy   => Proc.new { false },     # strategy to be executed when logging out and 'forgetting' the user
         :serialize_user    => [:id]                   # specify User model fields to be serialized into the login session
+                                                      # or define a custom class which receives the whole User model to handle by itself
     end
 
     class << self
