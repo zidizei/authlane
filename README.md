@@ -4,11 +4,24 @@ The **AuthLane** Sinatra Extension allows easy User authentication with support 
 
 The actual authentication logic (*strategy*) is defined by the Application using a namespaced DSL provided by this extension, while the general Extension configuration is handled with Sinatra's `set` method, which will be described in more detail below.
 
-## Setting up *Sinatra*
+## Installation
+
+Get the Gem:
+
+```
+gem install authlane
+```
+
+Or let Bundler do the work:
+
+``` ruby
+# Gemfile
+gem 'authlane'
+```
 
 **AuthLane** utilizes the standard Sinatra Extension format for *classic*-style applications:
 
-```
+``` ruby
 require 'sinatra'
 require 'sinatra/authlane'
 
@@ -21,7 +34,7 @@ end
 
 As well as `modular`-style applications:
 
-```
+``` ruby
 require 'sinatra/base'
 require 'sinatra/cookies'
 require 'sinatra/authlane'
@@ -33,28 +46,22 @@ class App < Sinatra::Base
   get '/user' do
     protect!
 
-    # Application stuff for signed in users ....
+    # Application stuff for signed in users
   end
 end
- ```
+```
 
-Both setups however require a separate **Session** *Rack middleware*, like `Rack::Session::Cookies`, which you need to provide for your *Sinatra* application (refer to [Sinatra's documentation](http://www.sinatrarb.com/intro.html#Using%20Sessions) on using Sessions).
-
-> **Note:** The inclusion of `sinatra/cookies` helper methods is a requirement by *AuthLane*, which currently it - at least when used modular - does not do automatically.
-
-## Configuring *AuthLane*
-
-### General configuration values
+## Configuration
 
 **AuthLane**'s configuration data is available under Sinatra's `settings` object with the key `:authlane` as a Hash, so changing config values is simply done with Sinatra's `set` method.
 
-```
+``` ruby
 set :authlane, :failed_route => '/login'
 ```
 
 The following settings can be customize (the used values are their defaults):
 
-```
+``` ruby
 set :authlane, :failed_route    => '/user/unauthorized',
                :session_key     => :authlane,
                :remember_cookie => :authlane_token,
@@ -75,4 +82,24 @@ Customize the Cookie's name that stores the token hash used for the *Remember Me
 
 #### `:serialize_user`
 
-The `:serialized_user` settings contains an Array of Symbols telling AuthLane which attributes of the User model that is used to identify Application users should be serialized into `SerializedUser`. It is recommended to not store the whole User object, but note that the *id* (or however the unique identifier of the object is named) attribute is required.
+The `:serialized_user` settings contains an Array of Symbols telling AuthLane which attributes of the User model that is used to identify Application users should be serialized into a `SerializedUser` object. It is recommended to not store the whole User object, but note that the *id* (or however the unique identifier of the object is named) attribute is required.
+
+Alternatively, you can specify your own Class to be used.
+
+``` ruby
+set :authlane, :serialize_user => CustomUser
+```
+
+The `CustomUser`'s `initialize` method receives one argument, which is the User object. What that object is exactly depends on your **Auth strategy** implementation. Basically, it's the User data coming from your application's persisting backend, like a database.
+
+``` ruby
+class CustomUser
+  attr_reader :id
+
+  def initialize(user)
+    @id = user.id
+  end
+end
+```
+
+It is possible to have attribute accessors in your custom Class, but beware that **AuthLane** will *not* save changes back to your backend.
