@@ -101,14 +101,12 @@ module Sinatra
       # to be used by passing the implementation as a Code block. It is then
       # stored as a `Proc` object and will be called by AuthLane when needed.
       #
-      # The following describes the `Proc` objects API requirements. It is
-      # required by the implemented strategy to follow these to be usable by AuthLane.
+      # To see the `Proc` objects API requirements, refer to the {https://github.com/zidizei/authlane/wiki Wiki}.
       #
       # @note While the **Auth** Strategy is primarily responsible for logging in users,
       #   it usually needs to implement some *Remember Me* logic as well.
       #
-      # @return [False, Object] The strategy needs to return the User Model object of
-      #   the user that successfully logged in or - in case of failure - `false`.
+      # @return [void]
       #
       # @example
       #   Sinatra::AuthLane.create_auth_strategy do
@@ -122,7 +120,10 @@ module Sinatra
       # @api AuthLane
       #
       def create_auth_strategy
-        @app.set :authlane, :auth_strategy => Proc.new
+        strat = Proc.new
+
+        @app.set :authlane, :auth_strategy => strat
+        strat
       end
 
       ##
@@ -142,8 +143,8 @@ module Sinatra
       #     roles.include? user.role    # See if the list of role names in `roles` contains the user's role
       #   end
       #
-      # @param [Array] roles The `Proc` receives a list of role names (e.g. as Symbols) a User needs to fullfill
-      #   to be allowed to see the route. The list is passed by the {Sinatra::AuthLane::Helpers#authorized? authorized?}
+      # @param [Object] roles The `Proc` receives an object of role names (e.g. a list of Symbols) a User needs to fullfill
+      #   to be allowed to see the route. The object is passed by the {Sinatra::AuthLane::Helpers#authorized? authorized?}
       #   helper.
       #
       # @return [Boolean] The strategy returns `true`, if the user met the necessary role requirements or `false` otherwise.
@@ -153,7 +154,10 @@ module Sinatra
       # @api AuthLane
       #
       def create_role_strategy(name = :roles)
-        @app.settings.authlane[:role_strategy][name] = Proc.new
+        strat = Proc.new
+
+        @app.settings.authlane[:role_strategy][name] = strat
+        strat
       end
 
       ##
@@ -184,7 +188,10 @@ module Sinatra
       # @api AuthLane
       #
       def create_remember_strategy
-        @app.set :authlane, :remember_strategy => Proc.new
+        strat = Proc.new
+
+        @app.set :authlane, :remember_strategy => strat
+        strat
       end
 
       ##
@@ -219,7 +226,10 @@ module Sinatra
       # @api AuthLane
       #
       def create_forget_strategy
-        @app.set :authlane, :forget_strategy => Proc.new
+        strat = Proc.new
+
+        @app.set :authlane, :forget_strategy => strat
+        strat
       end
     end
   end
