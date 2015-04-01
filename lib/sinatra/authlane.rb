@@ -86,7 +86,7 @@ module Sinatra
         :session_key       => :authlane,              # name of the Session key to store the login data
         :remember_cookie   => :'authlane.token',      # Cookie name to store 'Remember Me' token
         :auth_strategy     => Proc.new { false },     # strategy to be executed to log in users
-        :role_strategy     => Proc.new { true },      # strategy to be executed to check permissions and roles
+        :role_strategy     => { roles: Proc.new { true } },      # strategy to be executed to check permissions and roles
         :remember_strategy => Proc.new { false },     # strategy to be executed to log in users via 'Remember Me' token
         :forget_strategy   => Proc.new { false },     # strategy to be executed when logging out and 'forgetting' the user
         :serialize_user    => [:id]                   # specify User model fields to be serialized into the login session
@@ -152,8 +152,8 @@ module Sinatra
       #
       # @api AuthLane
       #
-      def create_role_strategy
-        @app.set :authlane, :role_strategy => Proc.new
+      def create_role_strategy(name = :roles)
+        @app.settings.authlane[:role_strategy][name] = Proc.new
       end
 
       ##
