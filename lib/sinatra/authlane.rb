@@ -101,12 +101,12 @@ module Sinatra
       # to be used by passing the implementation as a Code block. It is then
       # stored as a `Proc` object and will be called by AuthLane when needed.
       #
-      # To see the `Proc` objects API requirements, refer to the {https://github.com/zidizei/authlane/wiki Wiki}.
+      # To see the code block's objects API requirements, refer to the {https://github.com/zidizei/authlane/wiki Wiki}.
       #
       # @note While the **Auth** Strategy is primarily responsible for logging in users,
       #   it usually needs to implement some *Remember Me* logic as well.
       #
-      # @return [void]
+      # @return [Proc] the `Proc` object of the strategy.
       #
       # @example
       #   Sinatra::AuthLane.create_auth_strategy do
@@ -133,8 +133,7 @@ module Sinatra
       # to be used by passing the implementation as a Code block. It is then
       # stored as a `Proc` object and will be called by AuthLane when needed.
       #
-      # The following describes the `Proc` objects API requirements. It is
-      # required by the implemented strategy to follow these to be usable by AuthLane.
+      # To see the code block's API requirements, refer to the {https://github.com/zidizei/authlane/wiki Wiki}.
       #
       # @example
       #   Sinatra::AuthLane.create_role_strategy do |roles|
@@ -143,11 +142,9 @@ module Sinatra
       #     roles.include? user.role    # See if the list of role names in `roles` contains the user's role
       #   end
       #
-      # @param [Object] roles The `Proc` receives an object of role names (e.g. a list of Symbols) a User needs to fullfill
-      #   to be allowed to see the route. The object is passed by the {Sinatra::AuthLane::Helpers#authorized? authorized?}
-      #   helper.
+      # @param [Symbol] name The name of the role strategy.
       #
-      # @return [Boolean] The strategy returns `true`, if the user met the necessary role requirements or `false` otherwise.
+      # @return [Proc] the `Proc` object of the strategy.
       #
       # @see Sinatra::AuthLane::Helpers#authorized? authorized?
       #
@@ -167,8 +164,7 @@ module Sinatra
       # to be used by passing the implementation as a Code block. It is then
       # stored as a `Proc` object and will be called by AuthLane when needed.
       #
-      # The following describes the `Proc` objects API requirements. It is
-      # required by the implemented strategy to follow these to be usable by AuthLane.
+      # To see the code block's API requirements, refer to the {https://github.com/zidizei/authlane/wiki Wiki}.
       #
       # @note The **Remember** Strategy is only responsible for automatically logging in a user.
       #   The necessary Cookie token (plus any additional logic) is usually set in the **Auth** Strategy.
@@ -180,8 +176,7 @@ module Sinatra
       #     (remembered_user.nil?) ? false : remembered_user
       #   end
       #
-      # @return [False, Object] The strategy needs to return the User Model object of
-      #   the user that successfully logged in or - in case of failure - `false`.
+      # @return [Proc] the `Proc` object of the strategy.
       #
       # @see Sinatra::AuthLane::Helpers#authorized? authorized?
       #
@@ -201,13 +196,12 @@ module Sinatra
       # to be used by passing the implementation as a Code block. It is then
       # stored as a `Proc` object and will be called by AuthLane when needed.
       #
-      # The following describes the `Proc` objects API requirements. It is
-      # required by the implemented strategy to follow these to be usable by AuthLane.
+      # To see the code block's API requirements, refer to the {https://github.com/zidizei/authlane/wiki Wiki}.
       #
       # @note The **Forget** Strategy is the counter-part to the **Remember** Strategy.
       #   It's responsible for disabling the auto login technique and is called when logging out.
       #
-      # @note While the *Auth* and *Remember Strategy* needs to interact with the Cookie token directly,
+      # @note While the *Auth Strategy* needs to interact with the Cookie token directly,
       #   the *Forget Strategy* does not need to implement the deletion of the Cookie.
       #   This is done automatically by AuthLane behind the scenes.
       #
@@ -217,11 +211,9 @@ module Sinatra
       #     user.token = nil if user.token == token
       #   end
       #
-      # @param [Object] token The `Proc` object receives the *Remember Me* token of the current user.
-      #
       # @see Sinatra::AuthLane::Helpers#unauthorize! unauthorize!
       #
-      # @return [void]
+      # @return [Proc] the `Proc` object of the strategy.
       #
       # @api AuthLane
       #
