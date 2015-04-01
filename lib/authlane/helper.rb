@@ -39,11 +39,8 @@ module Sinatra
       # @see Sinatra::AuthLane.create_role_strategy create_role_strategy
       # @see Sinatra::AuthLane.create_remember_strategy create_remember_strategy
       #
-      def protect!(roles: nil, failed_route: nil)
-        # check for custom :failed_route option
-        failed_route ||= settings.authlane[:failed_route]
-
-        redirect failed_route unless authorized?(roles: roles)
+      def protect!(*roles)
+        redirect failed_route unless authorized?(*roles)
       end
 
       alias_method :protected, :protect!
@@ -70,7 +67,7 @@ module Sinatra
       #
       # @see Sinatra::AuthLane::Helpers#protect! protect!
       #
-      def authorized?(roles: nil)
+      def authorized?(roles = nil)
         # So, if session[settings.authlane[:session_key]] is available
         # we're home, otherwise, see if the 'Remember Me' strategy
         # can come up with some User credentials.
