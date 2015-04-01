@@ -8,7 +8,8 @@ module Sinatra
     #
     module Helpers
       ##
-      # @note This method uses {#authorized?} to decide, whether to redirect users to `failed_route`.
+      # @note This method uses {#authorized?} to decide, whether to redirect users to your app's `failed_route`.
+      #
       # Check if a user is authorized to view a route.
       #
       # It utilizes the *Role* and *Remember Strategy* to see if a user can access the route this
@@ -33,14 +34,16 @@ module Sinatra
       #     mustache :admin
       #   end
       #
-      # @param [Array] roles A list of role/privilege requirements for a route, set to `nil` to ignore user roles
-      # @param [String] failed_route Custom route to redirect to in case the user is not authorized
+      # @param [Hash] roles A Hash specifying the **Role Strategy** to be used with its key and optional arguments as the value.
+      #               **Example:** `protect! :rolename => arguments`
+      #
+      # @return [void]
       #
       # @see Sinatra::AuthLane.create_role_strategy create_role_strategy
       # @see Sinatra::AuthLane.create_remember_strategy create_remember_strategy
       #
       def protect!(*roles)
-        redirect failed_route unless authorized?(*roles)
+        redirect settings.authlane[:failed_route] unless authorized?(*roles)
       end
 
       alias_method :protected, :protect!
@@ -61,13 +64,14 @@ module Sinatra
       #     end
       #   end
       #
-      # @param [Array] roles A list of role/privilege requirements for a route, set to `nil` to ignore user roles
+      # @param [Hash] roles A Hash specifying the **Role Strategy** to be used with its key and optional arguments as the value.
+      #               **Example:** `protect! :rolename => arguments`
       #
       # @return [Boolean] `true` if the user is authorized to view a route, `false` otherwise.
       #
       # @see Sinatra::AuthLane::Helpers#protect! protect!
       #
-      def authorized?(roles = nil)
+      def authorized?(*roles)
         # So, if session[settings.authlane[:session_key]] is available
         # we're home, otherwise, see if the 'Remember Me' strategy
         # can come up with some User credentials.
@@ -92,11 +96,19 @@ module Sinatra
           return false
         else
           # User is logged in ...
-          unless roles.nil?
+          if roles.size == 1
             # ... but hold up, he might not have the necessary
             # privileges to access this particular route.
             # Let's ask the 'Role' strategy.
-            strat = self.instance_exec roles, &settings.authlane[:role_strategy]
+            if roles.first.is_a? Hash
+              role_name = roles.first.keys.first
+              role_args = roles.first[role_name]
+            else
+              role_name = roles.first
+              role_args = nil
+            end
+
+            strat = self.instance_exec role_args, &settings.authlane[:role_strategy][role_name]
             return false unless strat
           end
         end
@@ -179,7 +191,8 @@ module Sinatra
       #     mustache :account
       #   end
       #
-      # @return [SerializedUser] the user data serialized into the Session.
+      # @return [SerializedUser, Object] the user data serialized into the Session, either as `SerializedUser`
+      #   or a custom class set by the developer.
       #
       def current_user
         session[settings.authlane[:session_key]]

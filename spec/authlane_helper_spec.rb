@@ -10,9 +10,19 @@ describe Sinatra::AuthLane::Helpers do
 
       use Rack::Session::Cookie, :secret => 'rspec'
 
+      set :authlane, :serialize_user => [:id, :rank]
+
       Sinatra::AuthLane.create_auth_strategy do
         cookies[:'authlane.token'] = 'rspec'
-        { id: '1' }
+        { id: '1', rank: 1 }
+      end
+
+      Sinatra::AuthLane.create_role_strategy do |ranks|
+        current_user[:rank] == ((ranks.nil?) ? 1 : ranks)
+      end
+
+      Sinatra::AuthLane.create_role_strategy(:roles2) do |ranks|
+        current_user[:rank] == ((ranks.nil?) ? 2 : ranks)
       end
 
       get '/protected' do
@@ -30,6 +40,22 @@ describe Sinatra::AuthLane::Helpers do
       get '/authorize' do
         authorize!
         protect!
+      end
+
+      get '/role1' do
+        protect! :roles
+      end
+
+      get '/role1a' do
+        protect! :roles => 2
+      end
+
+      get '/role2' do
+        protect! :roles2
+      end
+
+      get '/role2a' do
+        protect! :roles2 => 1
       end
 
       get '/unauthorize' do
@@ -105,5 +131,29 @@ describe Sinatra::AuthLane::Helpers do
     get '/authorize'
     get '/user'#, {}, { 'rack.session' => { authlane: '1' } }
     expect(last_response.body).to eq('1')
+  end
+
+  it "should be able to use role strategy" do
+    get '/authorize'
+    get '/role1'
+    last_response.should be_ok
+  end
+
+  it "should be able to use role strategy with arguments" do
+    get '/authorize'
+    get '/role1a'
+    expect(last_response.headers['location']).to eq('http://example.org/user/unauthorized')
+  end
+
+  it "should be able to use named role strategy" do
+    get '/authorize'
+    get '/role2'
+    expect(last_response.headers['location']).to eq('http://example.org/user/unauthorized')
+  end
+
+  it "should be able to use named role strategy with arguments" do
+    get '/authorize'
+    get '/role2a'
+    last_response.should be_ok
   end
 end
